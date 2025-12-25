@@ -7,8 +7,15 @@ A WordPress plugin to easily embed your self-hosted **Simulcast.me** livestream 
 - **Live Status Indicator**: Automatically polls your stream status every 5 seconds.
 - **Auto-Play**: Automatically shows and loads the player when you go live.
 - **HLS Support**: Uses Video.js for reliable HLS playback.
+- **Stream Tipping**: Integrated support for viewer tips using WooCommerce.
 - **Secure**: Proxies API requests through your WordPress backend to keep your API Key hidden.
 - **Customizable**: Simple shortcode to place the player anywhere.
+
+## Stream Tips
+
+To accept tips, simply **install and activate WooCommerce**.
+The plugin will automatically create a hidden "Stream Tip" product for you.
+Users can click "Support the Stream" on the player, select an amount, and checkout via your existing WooCommerce payment gateways.
 
 ## Installation
 
