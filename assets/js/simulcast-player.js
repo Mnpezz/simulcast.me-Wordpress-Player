@@ -2,6 +2,9 @@ jQuery(document).ready(function ($) {
     const API_URL = simulcastData.apiUrl;
     let player = null;
 
+    // Initial state tracking
+    let wasLive = false;
+
     async function checkStream() {
         try {
             const response = await fetch(API_URL);
@@ -10,6 +13,14 @@ jQuery(document).ready(function ($) {
             const statusDiv = document.getElementById('simulcast-status');
 
             if (data.isLive) {
+                // Determine if this is a "Fresh Start" (transition from Offline -> Live)
+                const isFreshStart = !wasLive;
+
+                // Add timestamp to force fresh manifest (Cache Busting)
+                // If URL already has params, use &, otherwise ?
+                const separator = data.hlsUrl.includes('?') ? '&' : '?';
+                const hlsUrlWithTime = `${data.hlsUrl}${separator}t=${new Date().getTime()}`;
+
                 statusDiv.textContent = `🔴 LIVE: ${data.streamKeyLabel}`;
                 statusDiv.className = 'simulcast-status live';
 
@@ -51,35 +62,45 @@ jQuery(document).ready(function ($) {
                     });
 
                     player.ready(() => {
-                        // First load
-                        if (player.src() !== data.hlsUrl) {
-                            player.src({ type: 'application/x-mpegURL', src: data.hlsUrl });
-                            // Attempt to play, but catch errors (autoplay policies)
-                            player.play().catch(e => {
-                                if (e.name === 'NotAllowedError') {
-                                    console.log('Autoplay blocked (browser policy).');
-                                } else {
-                                    console.log('Playback failed (stream likely not ready), retrying...');
-                                }
-                            });
-                        }
+                        // First load - Always load with fresh timestamp
+                        player.src({ type: 'application/x-mpegURL', src: hlsUrlWithTime });
+                        // Attempt to play, but catch errors (autoplay policies)
+                        player.play().catch(e => {
+                            if (e.name === 'NotAllowedError') {
+                                console.log('Autoplay blocked (browser policy).');
+                            } else {
+                                console.log('Playback failed (stream likely not ready), retrying...');
+                            }
+                        });
                     });
                 } else if (!player.isDisposed()) {
                     // Update source if changed OR if player is in error state (retry logic)
-                    if (player.src() !== data.hlsUrl || player.error()) {
-                        console.log('Stream check: updating source or retrying...');
+                    // OR if this is a specific Fresh Start (stream just came back online)
+
+                    // Note regarding Fresh Start: Even if the base URL (data.hlsUrl) is the same,
+                    // we MUST reload if we just came online to clear old buffer/cache.
+                    const currentSrc = player.currentSrc();
+                    // Check if base URL matches (ignoring timestamp)
+                    const isSameBaseUrl = currentSrc && currentSrc.includes(data.hlsUrl);
+
+                    if (!isSameBaseUrl || player.error() || isFreshStart) {
+                        console.log('Stream check: updating source (Fresh Start or Retry)...');
+
                         if (player.error()) {
                             // Re-enter startup mode
                             player.addClass('vjs-live-startup');
                             player.error(null); // Clear error overlay
                             player.removeClass('vjs-waiting'); // Reset spinner state for fresh attempt
                         }
-                        player.src({ type: 'application/x-mpegURL', src: data.hlsUrl });
+
+                        player.src({ type: 'application/x-mpegURL', src: hlsUrlWithTime });
                         player.play().catch(e => {
                             if (e.name !== 'NotAllowedError') console.log('Retry playback failed, will try again...');
                         });
                     }
                 }
+
+                wasLive = true;
 
             } else {
                 statusDiv.textContent = '⚫ OFFLINE';
@@ -91,6 +112,8 @@ jQuery(document).ready(function ($) {
                 if (player && !player.isDisposed()) {
                     player.pause();
                 }
+
+                wasLive = false;
             }
         } catch (error) {
             console.error('Simulcast Check Error:', error);
