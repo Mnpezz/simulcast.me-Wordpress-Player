@@ -48,3 +48,152 @@
     display: block;
     visibility: visible;
 }
+
+/* --- Tipping Modal & Buttons --- */
+
+.simulcast-btn-primary {
+    background-color: #6772e5;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.simulcast-btn-primary:hover {
+    background-color: #5469d4;
+}
+
+.simulcast-btn-success {
+    background-color: #24b47e;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.simulcast-btn-success:hover {
+    background-color: #1e996b;
+}
+
+/* Modal Overlay */
+.simulcast-modal {
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.simulcast-modal-content {
+    background-color: #fefefe;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+/* Close Button */
+.simulcast-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.simulcast-close:hover {
+    color: black;
+}
+
+/* Tip Options Grid */
+.simulcast-tip-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.simulcast-tip-preset {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #f8f9fa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.simulcast-tip-preset:hover,
+.simulcast-tip-preset.selected {
+    background-color: #e3e8ee;
+    border-color: #6772e5;
+    color: #6772e5;
+}
+
+/* Custom Input */
+.simulcast-tip-custom {
+    margin-top: 15px;
+    text-align: left;
+}
+
+.simulcast-tip-custom label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #666;
+}
+
+.simulcast-input-group {
+    position: relative;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+#simulcast-custom-tip {
+    width: 100%;
+    padding: 10px;
+    padding-left: 25px;
+    /* space for symbol */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Hide error display during startup/retry phase to prevent glitching */
+.video-js.vjs-live-startup .vjs-error-display {
+    display: none !important;
+}
+
+/* Optional: Ensure spinner is visible during this phase if needed, 
+   though vjs-waiting usually handles it. */
+.video-js.vjs-live-startup.vjs-waiting .vjs-loading-spinner {
+    display: block;
+    visibility: visible;
+}
