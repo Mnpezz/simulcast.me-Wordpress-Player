@@ -103,4 +103,92 @@ jQuery(document).ready(function ($) {
 
     // Poll every 2.5 seconds (responsive retry)
     setInterval(checkStream, 2500);
+
+    /* --- Tipping Logic --- */
+    const $modal = $('#simulcast-tip-modal');
+    const $customInput = $('#simulcast-custom-tip');
+    let selectedAmount = 0;
+
+    // Open Modal
+    $('#open-tip-modal').on('click', function () {
+        $modal.fadeIn(200);
+        $modal.css('display', 'flex'); // Ensure flex for centering
+    });
+
+    // Close Modal
+    $('#close-tip-modal, .simulcast-modal').on('click', function (e) {
+        if (e.target === this) { // Click on backdrop or X
+            $modal.fadeOut(200);
+            $('#simulcast-tip-error').hide();
+        }
+    });
+
+    // Content click shouldn't close
+    $('.simulcast-modal-content').on('click', function (e) {
+        e.stopPropagation();
+    });
+
+    // Preset Selection
+    $('.simulcast-tip-preset').on('click', function () {
+        $('.simulcast-tip-preset').removeClass('selected');
+        $(this).addClass('selected');
+        selectedAmount = $(this).data('amount');
+        $customInput.val(''); // Clear custom
+    });
+
+    // Custom Input Logic
+    $customInput.on('input', function () {
+        $('.simulcast-tip-preset').removeClass('selected');
+        selectedAmount = parseFloat($(this).val());
+    });
+
+    // Submit Tip
+    $('#simulcast-submit-tip').on('click', function () {
+        const checkoutUrl = simulcastData.checkoutUrl;
+        const productId = simulcastData.tipProductId;
+        const errorDiv = $('#simulcast-tip-error');
+
+        // Validation
+        if (!selectedAmount || selectedAmount < 1) {
+            errorDiv.text('Please enter a valid amount (minimum $1).').show();
+            return;
+        }
+
+        if (!checkoutUrl || !productId) {
+            errorDiv.text('Error: Checkout not configured properly.').show();
+            return;
+        }
+
+        // Create a temporary form to submit to new tab
+        const form = $('<form>', {
+            'action': checkoutUrl,
+            'method': 'POST',
+            'target': '_blank' // Open in new tab so stream keeps playing
+        });
+
+        // Add Product ID (Trigger Add-To-Cart)
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'add-to-cart',
+            'value': productId
+        }));
+
+        // Add Custom Tip Amount
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'simulcast_tip_amount',
+            'value': selectedAmount
+        }));
+
+        // Submit
+        $('body').append(form);
+        form.submit();
+
+        // Cleanup Modal
+        $modal.fadeOut();
+        form.remove();
+
+        // Optional: Show "Thanks" message?
+        // alert('Thank you! Please complete your tip in the new tab.');
+    });
 });
