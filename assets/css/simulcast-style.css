@@ -1,0 +1,50 @@
+#simulcast-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: sans-serif;
+}
+
+.simulcast-status {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #f0f0f1;
+    color: #3c434a;
+}
+
+.simulcast-status.live {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.simulcast-status.offline {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.video-container {
+    width: 100%;
+}
+
+/* Ensure video-js is responsive */
+.video-js {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9;
+}
+
+/* Hide error display during startup/retry phase to prevent glitching */
+.video-js.vjs-live-startup .vjs-error-display {
+    display: none !important;
+}
+
+/* Optional: Ensure spinner is visible during this phase if needed, 
+   though vjs-waiting usually handles it. */
+.video-js.vjs-live-startup.vjs-waiting .vjs-loading-spinner {
+    display: block;
+    visibility: visible;
+}
